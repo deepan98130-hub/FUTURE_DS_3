@@ -1,0 +1,60 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv("/content/student_feedback.csv")
+
+# Drop unnecessary index column
+if "Unnamed: 0" in df.columns:
+    df.drop(columns=["Unnamed: 0"], inplace=True)
+
+# Rename columns for clarity
+df.columns = [
+    "Student_ID",
+    "Subject_Knowledge",
+    "Concept_Clarity",
+    "Presentation_Quality",
+    "Assignment_Difficulty",
+    "Doubt_Resolution",
+    "Course_Structure",
+    "Extra_Support",
+    "Course_Relevance"
+]
+
+# Summary statistics
+summary_stats = df.describe()
+
+# Calculate overall satisfaction score
+rating_columns = df.columns[1:]
+df["Overall_Satisfaction"] = df[rating_columns].mean(axis=1)
+
+# Average score per category
+avg_scores = df[rating_columns].mean().sort_values(ascending=False)
+
+# Plot: Average ratings per category
+plt.figure(figsize=(10, 6))
+avg_scores.plot(kind="bar", color='skyblue')
+plt.title("Average Student Feedback Ratings")
+plt.xlabel("Feedback Category")
+plt.ylabel("Average Rating")
+plt.xticks(rotation=45, ha="right")
+plt.tight_layout()
+plt.show()
+
+# Plot: Distribution of overall satisfaction
+plt.figure(figsize=(8, 5))
+plt.hist(df["Overall_Satisfaction"], bins=10, edgecolor='black', color='lightcoral')
+plt.title("Overall Student Satisfaction Distribution")
+plt.xlabel("Satisfaction Score")
+plt.ylabel("Number of Students")
+plt.tight_layout()
+plt.show()
+
+# Identify improvement areas (lowest rated aspects)
+improvement_areas = avg_scores.tail(3)
+
+print("=== Summary Statistics ===")
+print(summary_stats)
+
+print("\n=== Key Improvement Areas ===")
+print(improvement_areas)
